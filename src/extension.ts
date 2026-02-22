@@ -2,8 +2,16 @@ import * as vscode from "vscode";
 import { watchConfig } from "./config/config-watcher";
 import { readConfig } from "./config/workspace-config";
 import { COMMANDS } from "./constants";
-import { disposeDecorations } from "./hide/decoration-provider";
-import { refreshAllEditors, refreshEditor, toggleStreamMode } from "./hide/hide-manager";
+import { clearDecorations, disposeDecorations, initDecorations } from "./hide/decoration-provider";
+import {
+    evictCacheForDocument,
+    invalidateConfigCache,
+    preCacheDocument,
+    refreshAllEditors,
+    refreshEditor,
+    toggleStreamMode,
+} from "./hide/hide-manager";
+import { disableTokenHiding, enableTokenHiding, isTokenHidingEnabled } from "./hide/token-hider";
 import { disposeLogger, logInfo } from "./utils/logger";
 
 let statusBarItem: vscode.StatusBarItem | undefined;
@@ -21,6 +29,24 @@ function updateStatusBar(): void {
 
 export function activate(context: vscode.ExtensionContext): void {
     logInfo("StreamHider activating.");
+
+    // Eagerly create the decoration type so it's ready before any editor opens
+    initDecorations();
+
+    // Synchronise token-level hiding with the current enabled state.
+    // This ensures that if the extension was activated with stream mode ON,
+    // the textMateRules are in place from the start (no flash).
+    const { enabled } = readConfig();
+    if (enabled && !isTokenHidingEnabled()) {
+        void enableTokenHiding();
+    } else if (!enabled && isTokenHidingEnabled()) {
+        void disableTokenHiding();
+    }
+
+    // Pre-parse all currently open documents so the cache is warm
+    for (const doc of vscode.workspace.textDocuments) {
+        preCacheDocument(doc);
+    }
 
     // Status bar
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -41,22 +67,60 @@ export function activate(context: vscode.ExtensionContext): void {
     // React to config changes
     context.subscriptions.push(
         watchConfig(() => {
+            invalidateConfigCache();
             updateStatusBar();
             refreshAllEditors();
         }),
     );
 
-    // React to document changes (real-time)
+    // Pre-parse documents as soon as they are opened (before they appear in an editor)
     context.subscriptions.push(
-        vscode.workspace.onDidChangeTextDocument((event) => {
-            const editor = vscode.window.visibleTextEditors.find((e) => e.document === event.document);
+        vscode.workspace.onDidOpenTextDocument((document) => {
+            preCacheDocument(document);
+        }),
+    );
+
+    // Evict cache when documents are closed
+    context.subscriptions.push(
+        vscode.workspace.onDidCloseTextDocument((document) => {
+            evictCacheForDocument(document.uri);
+        }),
+    );
+
+    // React to active editor changes — fires earlier than onDidChangeVisibleTextEditors
+    context.subscriptions.push(
+        vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor) {
                 refreshEditor(editor);
             }
         }),
     );
 
-    // React to newly visible editors
+    // React to document changes (real-time) — invalidate cache and re-apply
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeTextDocument((event) => {
+            // Evict stale cache first so refreshEditor never reads old ranges
+            evictCacheForDocument(event.document.uri);
+
+            // Collect ALL editors showing this document (handles split views)
+            const editors = vscode.window.visibleTextEditors.filter((e) => e.document === event.document);
+
+            // Clear old decorations on every editor BEFORE re-parsing.
+            // This prevents VS Code's internal Range-tracking from keeping
+            // shifted decorations visible after hide comments are removed.
+            for (const editor of editors) {
+                clearDecorations(editor);
+            }
+
+            // Re-parse the updated document and refresh each editor
+            preCacheDocument(event.document);
+            for (const editor of editors) {
+                refreshEditor(editor);
+            }
+        }),
+    );
+
+    // React to newly visible editors (fallback for split views etc.)
     context.subscriptions.push(
         vscode.window.onDidChangeVisibleTextEditors((editors) => {
             for (const editor of editors) {
@@ -72,6 +136,10 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export function deactivate(): void {
+    // Clean up token-level hiding so we don't leave stale textMateRules
+    if (isTokenHidingEnabled()) {
+        void disableTokenHiding();
+    }
     disposeDecorations();
     disposeLogger();
 }

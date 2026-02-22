@@ -12,13 +12,7 @@ export const CONFIG_KEYS = {
     ENABLED: "streamHider.enabled",
     HIDDEN_FILE_PATTERNS: "streamHider.hiddenFilePatterns",
     HIDDEN_FOLDERS: "streamHider.hiddenFolders",
-    REPLACEMENT: "streamHider.replacement",
 } as const;
-
-/**
- * Default placeholder text shown instead of hidden content.
- */
-export const DEFAULT_REPLACEMENT = "[ 🔴 HIDDEN ]";
 
 /**
  * Comment tokens used to trigger inline hiding behaviour.

@@ -1,35 +1,50 @@
 import * as vscode from "vscode";
 import type { DecorationContext } from "../types";
 
-/** Keyed by replacement text so we can reuse the same decoration type. */
-const decorationTypes = new Map<string, vscode.TextEditorDecorationType>();
+/** Single decoration type used for all hidden ranges (redaction bar style). */
+let hiddenDecorationType: vscode.TextEditorDecorationType | undefined;
 
-function getDecorationType(replacement: string): vscode.TextEditorDecorationType {
-    const existing = decorationTypes.get(replacement);
-    if (existing) {
-        return existing;
+function getDecorationType(): vscode.TextEditorDecorationType {
+    if (hiddenDecorationType) {
+        return hiddenDecorationType;
     }
 
-    const decorationType = vscode.window.createTextEditorDecorationType({
+    hiddenDecorationType = vscode.window.createTextEditorDecorationType({
+        backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
+        opacity: "0",
+        isWholeLine: true,
+        overviewRulerColor: new vscode.ThemeColor("editorWarning.foreground"),
+        overviewRulerLane: vscode.OverviewRulerLane.Full,
         before: {
-            contentText: replacement,
-            color: new vscode.ThemeColor("editorWarning.foreground"),
-            fontStyle: "italic",
+            contentText: "\u00A0\u00A0🔒\u00A0Hidden\u00A0\u00A0",
+            color: new vscode.ThemeColor("editor.background"),
+            backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
+            fontWeight: "bold",
+            margin: "0 4px 0 0",
         },
-        color: "transparent",
-        letterSpacing: "-1000em",
+        after: {
+            contentText: "\u00A0",
+            backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
+        },
     });
 
-    decorationTypes.set(replacement, decorationType);
-    return decorationType;
+    return hiddenDecorationType;
+}
+
+/**
+ * Eagerly creates the decoration type so it is ready before any editor opens.
+ * Call once during extension activation.
+ */
+export function initDecorations(): void {
+    getDecorationType();
 }
 
 /**
  * Applies hiding decorations to the given editor for all hidden ranges.
  */
 export function applyDecorations(ctx: DecorationContext): void {
-    const { editor, hiddenRanges, replacement } = ctx;
-    const decorationType = getDecorationType(replacement);
+    const { editor, hiddenRanges } = ctx;
+    const decorationType = getDecorationType();
 
     const ranges = hiddenRanges.map(({ startLine, endLine }) => {
         const start = editor.document.lineAt(startLine).range.start;
@@ -44,8 +59,8 @@ export function applyDecorations(ctx: DecorationContext): void {
  * Clears all StreamHider decorations from the given editor.
  */
 export function clearDecorations(editor: vscode.TextEditor): void {
-    for (const decorationType of decorationTypes.values()) {
-        editor.setDecorations(decorationType, []);
+    if (hiddenDecorationType) {
+        editor.setDecorations(hiddenDecorationType, []);
     }
 }
 
@@ -53,8 +68,8 @@ export function clearDecorations(editor: vscode.TextEditor): void {
  * Disposes all cached decoration types (call on extension deactivation).
  */
 export function disposeDecorations(): void {
-    for (const decorationType of decorationTypes.values()) {
-        decorationType.dispose();
+    if (hiddenDecorationType) {
+        hiddenDecorationType.dispose();
+        hiddenDecorationType = undefined;
     }
-    decorationTypes.clear();
 }

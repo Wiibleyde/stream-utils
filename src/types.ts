@@ -7,7 +7,6 @@ export interface StreamHiderConfig {
     enabled: boolean;
     hiddenFilePatterns: string[];
     hiddenFolders: string[];
-    replacement: string;
 }
 
 /**
@@ -32,7 +31,6 @@ export interface ParseResult {
 export interface DecorationContext {
     editor: vscode.TextEditor;
     hiddenRanges: HiddenRange[];
-    replacement: string;
 }
 
 /**
