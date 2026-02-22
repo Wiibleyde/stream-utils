@@ -30,7 +30,7 @@ function isTokenInComment(line: string, token: string, commentPrefixes: string[]
  * based on `@stream-hide-*` comment annotations.
  *
  * Rules:
- *  - `// @stream-hide-next`   → hides the *next* non-hide-comment line
+ *  - `// @stream-hide-next`   → hides the annotation *and* the next line
  *  - `// @stream-hide-start` / `// @stream-hide-end` → hides the block between them (inclusive)
  *  - `// @stream-hide-inline` at end of line → hides that specific line
  *
@@ -41,7 +41,7 @@ function isTokenInComment(line: string, token: string, commentPrefixes: string[]
  */
 export function parseHideComments(lines: string[], languageId?: string): ParseResult {
     const hiddenRanges: HiddenRange[] = [];
-    let hideNext = false;
+    let hideNextFrom: number | undefined;
     let blockStart: number | undefined;
 
     const prefixes = languageId ? getCommentPrefixes(languageId) : [];
@@ -63,20 +63,25 @@ export function parseHideComments(lines: string[], languageId?: string): ParseRe
         }
 
         if (isTokenInComment(line, COMMENT_TOKENS.HIDE_NEXT, prefixes)) {
-            hideNext = true;
+            hideNextFrom = i;
             continue;
         }
 
         if (isTokenInComment(line, COMMENT_TOKENS.HIDE_INLINE, prefixes)) {
             hiddenRanges.push({ startLine: i, endLine: i });
-            hideNext = false;
+            hideNextFrom = undefined;
             continue;
         }
 
-        if (hideNext) {
-            hiddenRanges.push({ startLine: i, endLine: i });
-            hideNext = false;
+        if (hideNextFrom !== undefined) {
+            hiddenRanges.push({ startLine: hideNextFrom, endLine: i });
+            hideNextFrom = undefined;
         }
+    }
+
+    // If @stream-hide-next was the very last line, still hide the annotation itself
+    if (hideNextFrom !== undefined) {
+        hiddenRanges.push({ startLine: hideNextFrom, endLine: hideNextFrom });
     }
 
     return { hiddenRanges };

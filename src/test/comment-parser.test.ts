@@ -3,24 +3,26 @@ import { parseHideComments } from "../hide/comment-parser";
 
 describe("comment-parser", () => {
     describe("@stream-hide-next", () => {
-        it("hides the line immediately following the annotation", () => {
+        it("hides the annotation and the line immediately following it", () => {
             const lines = ["// @stream-hide-next", "const secret = 'hunter2';", "const visible = true;"];
             const { hiddenRanges } = parseHideComments(lines);
             assert.strictEqual(hiddenRanges.length, 1);
-            assert.deepStrictEqual(hiddenRanges[0], { startLine: 1, endLine: 1 });
+            assert.deepStrictEqual(hiddenRanges[0], { startLine: 0, endLine: 1 });
         });
 
         it("does not hide lines beyond the next line", () => {
             const lines = ["// @stream-hide-next", "const secret = 'hunter2';", "const alsoVisible = true;"];
             const { hiddenRanges } = parseHideComments(lines);
             assert.strictEqual(hiddenRanges.length, 1);
+            assert.strictEqual(hiddenRanges[0].startLine, 0);
             assert.strictEqual(hiddenRanges[0].endLine, 1);
         });
 
         it("handles annotation at the very last line (no following line)", () => {
             const lines = ["// @stream-hide-next"];
             const { hiddenRanges } = parseHideComments(lines);
-            assert.strictEqual(hiddenRanges.length, 0);
+            assert.strictEqual(hiddenRanges.length, 1);
+            assert.deepStrictEqual(hiddenRanges[0], { startLine: 0, endLine: 0 });
         });
     });
 
@@ -106,21 +108,21 @@ describe("comment-parser", () => {
             const lines = ["-- @stream-hide-next", "local secret = 'hunter2'", "local visible = true"];
             const { hiddenRanges } = parseHideComments(lines, "lua");
             assert.strictEqual(hiddenRanges.length, 1);
-            assert.deepStrictEqual(hiddenRanges[0], { startLine: 1, endLine: 1 });
+            assert.deepStrictEqual(hiddenRanges[0], { startLine: 0, endLine: 1 });
         });
 
         it("parses Python-style comments with # prefix", () => {
             const lines = ["# @stream-hide-next", "secret = 'hunter2'", "visible = True"];
             const { hiddenRanges } = parseHideComments(lines, "python");
             assert.strictEqual(hiddenRanges.length, 1);
-            assert.deepStrictEqual(hiddenRanges[0], { startLine: 1, endLine: 1 });
+            assert.deepStrictEqual(hiddenRanges[0], { startLine: 0, endLine: 1 });
         });
 
         it("parses TypeScript-style comments with // prefix", () => {
             const lines = ["// @stream-hide-next", "const secret = 'hunter2';", "const visible = true;"];
             const { hiddenRanges } = parseHideComments(lines, "typescript");
             assert.strictEqual(hiddenRanges.length, 1);
-            assert.deepStrictEqual(hiddenRanges[0], { startLine: 1, endLine: 1 });
+            assert.deepStrictEqual(hiddenRanges[0], { startLine: 0, endLine: 1 });
         });
 
         it("parses Lua-style block hide comments", () => {
@@ -159,7 +161,7 @@ describe("comment-parser", () => {
             const lines = ["-- @stream-hide-next", "local secret = 'hunter2'"];
             const { hiddenRanges } = parseHideComments(lines);
             assert.strictEqual(hiddenRanges.length, 1);
-            assert.deepStrictEqual(hiddenRanges[0], { startLine: 1, endLine: 1 });
+            assert.deepStrictEqual(hiddenRanges[0], { startLine: 0, endLine: 1 });
         });
 
         it("uses fallback prefixes for unknown languages", () => {
