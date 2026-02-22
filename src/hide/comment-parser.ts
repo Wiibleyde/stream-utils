@@ -7,10 +7,10 @@ import type { HiddenRange, ParseResult } from "../types";
  *
  * When `commentPrefixes` are provided the function checks that the token
  * appears *after* one of the recognised comment prefixes, preventing
- * false positives in string literals or code.  When the list is empty
+ * false positives in string literals or code. When the list is empty
  * or omitted the check falls back to a simple `includes()`.
  */
-function lineContainsToken(line: string, token: string, commentPrefixes: string[]): boolean {
+function isTokenInComment(line: string, token: string, commentPrefixes: string[]): boolean {
     if (!line.includes(token)) {
         return false;
     }
@@ -49,12 +49,12 @@ export function parseHideComments(lines: string[], languageId?: string): ParseRe
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        if (lineContainsToken(line, COMMENT_TOKENS.HIDE_START, prefixes)) {
+        if (isTokenInComment(line, COMMENT_TOKENS.HIDE_START, prefixes)) {
             blockStart = i;
             continue;
         }
 
-        if (lineContainsToken(line, COMMENT_TOKENS.HIDE_END, prefixes)) {
+        if (isTokenInComment(line, COMMENT_TOKENS.HIDE_END, prefixes)) {
             if (blockStart !== undefined) {
                 hiddenRanges.push({ startLine: blockStart, endLine: i });
                 blockStart = undefined;
@@ -62,12 +62,12 @@ export function parseHideComments(lines: string[], languageId?: string): ParseRe
             continue;
         }
 
-        if (lineContainsToken(line, COMMENT_TOKENS.HIDE_NEXT, prefixes)) {
+        if (isTokenInComment(line, COMMENT_TOKENS.HIDE_NEXT, prefixes)) {
             hideNext = true;
             continue;
         }
 
-        if (lineContainsToken(line, COMMENT_TOKENS.HIDE_INLINE, prefixes)) {
+        if (isTokenInComment(line, COMMENT_TOKENS.HIDE_INLINE, prefixes)) {
             hiddenRanges.push({ startLine: i, endLine: i });
             hideNext = false;
             continue;
