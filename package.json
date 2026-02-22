@@ -4,6 +4,16 @@
   "description": "Hide sensitive parts of your code visually during live streams without modifying source files",
   "version": "1.0.0",
   "publisher": "NathanBonnell",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wiibleyde/stream-utils.git"
+  },
+  "homepage": "https://github.com/Wiibleyde/stream-utils#readme",
+  "bugs": {
+    "url": "https://github.com/Wiibleyde/stream-utils/issues"
+  },
+  "qna": "marketplace",
   "engines": {
     "vscode": "^1.85.0"
   },

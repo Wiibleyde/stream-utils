@@ -1,0 +1,11 @@
+.vscode/**
+.github/**
+src/**
+out/test/**
+biome.json
+tsconfig.json
+.mocharc.json
+**/*.ts
+**/*.map
+.gitignore
+node_modules/**

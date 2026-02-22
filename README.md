@@ -14,7 +14,7 @@ All hiding is done via the VSCode `TextEditorDecorationType` API — purely visu
 
 1. Open VS Code.
 2. Press `Ctrl+P` (or `Cmd+P` on macOS) to open the Quick Open bar.
-3. Type `ext install Wiibleyde.stream-hider` and press `Enter`.
+3. Type `ext install NathanBonnell.stream-hider` and press `Enter`.
 4. Click **Install**.
 
 Or open the Extensions view (`Ctrl+Shift+X`), search for **StreamHider**, and click **Install**.

@@ -10,7 +10,7 @@ jobs:
     name: Package & Publish
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # needed to create GitHub Releases
+      contents: write # needed to create GitHub Releases
 
     steps:
       - name: Checkout
@@ -47,7 +47,7 @@ jobs:
           path: "*.vsix"
 
       - name: Publish to Visual Studio Marketplace
-        if: ${{ secrets.VSCE_PAT != '' }}
+        if: ${{ env.VSCE_PAT != '' }}
         run: vsce publish --no-dependencies
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
