@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "publisher": "NathanBonnell",
   "license": "MIT",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/Wiibleyde/stream-utils.git"
@@ -19,6 +20,13 @@
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "stream",
+    "privacy",
+    "twitch",
+    "hide",
+    "sensitive"
   ],
   "activationEvents": [
     "onStartupFinished"
