@@ -39,54 +39,6 @@
         "title": "StreamHider: Toggle Stream Mode"
       }
     ],
-    "grammars": [
-      {
-        "scopeName": "inject.stream-hider",
-        "path": "./syntaxes/stream-hidden.tmLanguage.json",
-        "injectTo": [
-          "source.ts",
-          "source.tsx",
-          "source.js",
-          "source.jsx",
-          "source.python",
-          "source.java",
-          "source.cs",
-          "source.c",
-          "source.cpp",
-          "source.go",
-          "source.rust",
-          "source.lua",
-          "source.ruby",
-          "source.php",
-          "source.swift",
-          "source.kotlin",
-          "source.dart",
-          "source.r",
-          "source.shell",
-          "source.powershell",
-          "source.sql",
-          "source.css",
-          "source.css.scss",
-          "source.json",
-          "source.yaml",
-          "source.toml",
-          "source.dockerfile",
-          "source.makefile",
-          "source.haskell",
-          "source.elixir",
-          "source.scala",
-          "source.clojure",
-          "source.fsharp",
-          "source.ocaml",
-          "source.perl",
-          "source.groovy",
-          "text.html.basic",
-          "text.html.php",
-          "text.html.markdown",
-          "text.xml"
-        ]
-      }
-    ],
     "configuration": {
       "title": "StreamHider",
       "properties": {

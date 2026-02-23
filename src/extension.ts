@@ -11,7 +11,6 @@ import {
     refreshEditor,
     toggleStreamMode,
 } from "./hide/hide-manager";
-import { disableTokenHiding, enableTokenHiding, isTokenHidingEnabled } from "./hide/token-hider";
 import { disposeLogger, logInfo } from "./utils/logger";
 
 let statusBarItem: vscode.StatusBarItem | undefined;
@@ -32,16 +31,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
     // Eagerly create the decoration type so it's ready before any editor opens
     initDecorations();
-
-    // Synchronise token-level hiding with the current enabled state.
-    // This ensures that if the extension was activated with stream mode ON,
-    // the textMateRules are in place from the start (no flash).
-    const { enabled } = readConfig();
-    if (enabled && !isTokenHidingEnabled()) {
-        void enableTokenHiding();
-    } else if (!enabled && isTokenHidingEnabled()) {
-        void disableTokenHiding();
-    }
 
     // Pre-parse all currently open documents so the cache is warm
     for (const doc of vscode.workspace.textDocuments) {
@@ -136,10 +125,6 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export function deactivate(): void {
-    // Clean up token-level hiding so we don't leave stale textMateRules
-    if (isTokenHidingEnabled()) {
-        void disableTokenHiding();
-    }
     disposeDecorations();
     disposeLogger();
 }

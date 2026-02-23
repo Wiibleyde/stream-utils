@@ -5,7 +5,6 @@ import { logInfo, logWarn } from "../utils/logger";
 import { parseHideComments } from "./comment-parser";
 import { applyDecorations, clearDecorations } from "./decoration-provider";
 import { matchesAnyPattern } from "./pattern-matcher";
-import { disableTokenHiding, enableTokenHiding } from "./token-hider";
 
 /**
  * Cached hidden-range data per document URI, so we can apply decorations
@@ -149,14 +148,6 @@ export async function toggleStreamMode(): Promise<void> {
     const newValue = !config.enabled;
 
     try {
-        // Toggle token-level hiding FIRST so text becomes transparent
-        // before decorations need to catch up.
-        if (newValue) {
-            await enableTokenHiding();
-        } else {
-            await disableTokenHiding();
-        }
-
         await vscode.workspace
             .getConfiguration()
             .update("streamHider.enabled", newValue, vscode.ConfigurationTarget.Global);
