@@ -14,4 +14,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Custom language comment prefixes** — override comment syntax per language ID via `streamHider.languageCommentPrefixes`.
 - **Built-in language support** — 20+ languages with pre-configured comment syntax.
 - **Real-time updates** — decorations refresh instantly on every document change or config change.
-- **TextMate injection grammar** — syntax-level hiding for zero-delay visual feedback.

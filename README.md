@@ -2,9 +2,9 @@
 
 ![CI](https://github.com/Wiibleyde/stream-utils/actions/workflows/ci.yml/badge.svg)
 
-Hide sensitive parts of your code **visually** during live streams (Twitch, YouTube, etc.) without ever modifying the actual source files.
+Visually **redact** parts of your code during live streams (Twitch, YouTube, etc.) without ever modifying the actual source files.
 
-All hiding is done via the VSCode `TextEditorDecorationType` API — purely visual and non-destructive.
+All redacting is done via the VSCode `TextEditorDecorationType` API — purely visual and non-destructive.
 
 ---
 
@@ -62,8 +62,8 @@ code --install-extension stream-hider-*.vsix
 
 ## Features
 
-- **File/folder hiding** — glob-pattern-based full-file hiding via workspace settings
-- **Inline comment hiding** — annotate individual lines or blocks with special comments
+- **File/folder redacting** — glob-pattern-based full-file redacting via workspace settings
+- **Inline comment redacting** — annotate individual lines or blocks with special comments
 - **Status bar indicator** — always know whether stream mode is active
 - **Toggle command** — quickly enable/disable with `StreamHider: Toggle Stream Mode`
 - **Real-time updates** — decorations refresh instantly on every document change or config change
@@ -74,24 +74,24 @@ code --install-extension stream-hider-*.vsix
 
 | Annotation | Effect |
 |---|---|
-| `// @stream-hide-next` | Hides the **next** line |
-| `// @stream-hide-inline` | Hides the line that contains this annotation |
-| `// @stream-hide-start` | Starts a hidden block |
-| `// @stream-hide-end` | Ends a hidden block |
+| `// @stream-hide-next` | Redacts the **next** line |
+| `// @stream-hide-inline` | Redacts the line that contains this annotation |
+| `// @stream-hide-start` | Starts a redacted block |
+| `// @stream-hide-end` | Ends a redacted block |
 
 ### Examples
 
 ```ts
 // @stream-hide-next
-const myValue = "some-value-here";   // ← this line is hidden
+const greeting = "Hello, world!";    // ← this line is redacted
 
-const config = getConfig();          // @stream-hide-inline  ← this line is hidden
+const config = loadSettings();       // @stream-hide-inline  ← this line is redacted
 
 // @stream-hide-start
-const connectionString = "...";      // These lines
-const endpoint = "...";              // are all hidden
+const host = "localhost";
+const port = 3000;
 // @stream-hide-end
-// ↑ everything between start/end is hidden
+// ↑ everything between start/end is redacted
 ```
 
 ---
@@ -109,8 +109,8 @@ const endpoint = "...";              // are all hidden
 | Setting | Type | Default | Description |
 |---|---|---|---|
 | `streamHider.enabled` | `boolean` | `false` | Toggle the extension globally |
-| `streamHider.hiddenFilePatterns` | `string[]` | `[]` | Glob patterns — files matching these have their entire content hidden |
-| `streamHider.hiddenFolders` | `string[]` | `[]` | Glob patterns — files inside matching folders are fully hidden |
+| `streamHider.hiddenFilePatterns` | `string[]` | `[]` | Glob patterns — files matching these have their entire content redacted |
+| `streamHider.hiddenFolders` | `string[]` | `[]` | Glob patterns — files inside matching folders are fully redacted |
 | `streamHider.languageCommentPrefixes` | `object` | `{}` | Custom comment prefixes per language ID (e.g. `{ "lua": ["--"] }`) |
 
 ---
@@ -119,7 +119,7 @@ const endpoint = "...";              // are all hidden
 
 | Command | Description |
 |---|---|
-| `StreamHider: Toggle Stream Mode` | Enables or disables stream hiding |
+| `StreamHider: Toggle Stream Mode` | Enables or disables stream redacting |
 
 ---
 

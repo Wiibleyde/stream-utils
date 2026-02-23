@@ -10,13 +10,14 @@ function getDecorationType(): vscode.TextEditorDecorationType {
     }
 
     hiddenDecorationType = vscode.window.createTextEditorDecorationType({
+        color: new vscode.ThemeColor("editorWarning.foreground"),
         backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
-        opacity: "0",
+        letterSpacing: "-0.5em",
         isWholeLine: true,
         overviewRulerColor: new vscode.ThemeColor("editorWarning.foreground"),
         overviewRulerLane: vscode.OverviewRulerLane.Full,
         before: {
-            contentText: "\u00A0\u00A0🔒\u00A0Hidden\u00A0\u00A0",
+            contentText: "\u00A0\u00A0🔒\u00A0Redacted\u00A0\u00A0",
             color: new vscode.ThemeColor("editor.background"),
             backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
             fontWeight: "bold",

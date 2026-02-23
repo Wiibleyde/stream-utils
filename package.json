@@ -1,7 +1,7 @@
 {
   "name": "stream-hider",
   "displayName": "StreamHider",
-  "description": "Hide sensitive parts of your code visually during live streams without modifying source files",
+  "description": "Visually redact code during live streams — no file modifications",
   "version": "1.0.2",
   "publisher": "NathanBonnell",
   "license": "MIT",
@@ -23,10 +23,10 @@
   ],
   "keywords": [
     "stream",
-    "privacy",
+    "streaming",
     "twitch",
-    "hide",
-    "sensitive"
+    "redact",
+    "overlay"
   ],
   "activationEvents": [
     "onStartupFinished"

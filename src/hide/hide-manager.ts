@@ -140,8 +140,7 @@ export function refreshEditor(editor: vscode.TextEditor): void {
 }
 
 /**
- * Toggles the `streamHider.enabled` setting in the user configuration
- * and synchronises the token-level hiding (textMateRules) accordingly.
+ * Toggles the `streamHider.enabled` setting in the user configuration.
  */
 export async function toggleStreamMode(): Promise<void> {
     const config = getCachedConfig();
