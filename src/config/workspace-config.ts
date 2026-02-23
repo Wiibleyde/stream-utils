@@ -10,8 +10,8 @@ export function readConfig(): StreamGuardConfig {
     const cfg = vscode.workspace.getConfiguration();
 
     const enabled = cfg.get<boolean>(CONFIG_KEYS.ENABLED) ?? false;
-    const redactedFilePatterns = cfg.get<string[]>(CONFIG_KEYS.REDACTED_FILE_PATTERNS) ?? [];
-    const redactedFolders = cfg.get<string[]>(CONFIG_KEYS.REDACTED_FOLDERS) ?? [];
+    const maskedFilePatterns = cfg.get<string[]>(CONFIG_KEYS.MASKED_FILE_PATTERNS) ?? [];
+    const maskedFolders = cfg.get<string[]>(CONFIG_KEYS.MASKED_FOLDERS) ?? [];
 
     // Apply user-defined language comment prefixes (if any)
     const customPrefixes = cfg.get<Record<string, string[]>>(LANGUAGE_CONFIG_KEY) ?? {};
@@ -19,5 +19,5 @@ export function readConfig(): StreamGuardConfig {
         applyCustomPrefixes(customPrefixes);
     }
 
-    return { enabled, redactedFilePatterns, redactedFolders };
+    return { enabled, maskedFilePatterns, maskedFolders };
 }

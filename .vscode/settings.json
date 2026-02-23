@@ -1,5 +1,5 @@
 {
-    "streamGuard.redactedFolders": [
+    "streamGuard.maskedFolders": [
         "**/config/**"
     ],
     "streamGuard.enabled": false

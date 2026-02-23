@@ -10,7 +10,7 @@ The extension follows a layered architecture rooted in `src/`:
 
 - **Entry point**: [src/extension.ts](src/extension.ts) — `activate()` wires up the status bar, commands, config watchers, and document-change listeners; `deactivate()` disposes resources.
 - **Orchestrator**: [src/hide/hide-manager.ts](src/hide/hide-manager.ts) — `refreshEditor()` is the core pipeline: read config → check file/folder glob patterns → parse comment annotations → apply decorations. All visible editors are refreshed on config change, document edit, or editor visibility change.
-- **Comment parser**: [src/hide/comment-parser.ts](src/hide/comment-parser.ts) — stateless function `parseHideComments(lines, languageId?)` returns `RedactedRange[]`. Supports `@stream-hide-next`, `@stream-hide-inline`, `@stream-hide-start`/`@stream-hide-end`.
+- **Comment parser**: [src/hide/comment-parser.ts](src/hide/comment-parser.ts) — stateless function `parseHideComments(lines, languageId?)` returns `RedactedRange[]`. Supports `@stream-guard-next`, `@stream-guard-inline`, `@stream-guard-start`/`@stream-guard-end`.
 - **Decoration provider**: [src/hide/decoration-provider.ts](src/hide/decoration-provider.ts) — manages `TextEditorDecorationType` instances keyed by replacement text. Uses `letterSpacing: "-1000em"` + transparent color to visually collapse text, with a `before` pseudo-element showing the placeholder.
 - **Pattern matcher**: [src/hide/pattern-matcher.ts](src/hide/pattern-matcher.ts) — minimal glob-to-regex converter (no external deps). Normalizes backslashes and tests both full path and basename.
 - **Language config**: [src/languages/language-config.ts](src/languages/language-config.ts) — built-in comment-syntax registry for 20+ languages. Users can override via `StreamGuard.languageCommentPrefixes`. Unknown languages fall back to `["//", "#", "--"]`.
@@ -23,7 +23,7 @@ User toggles / edits doc / config changes
   → refreshEditor(editor)
     → readConfig()            (workspace settings)
     → matchesAnyPattern()     (glob check → hide entire file?)
-    → parseHideComments()     (scan lines for @stream-hide-* tokens)
+    → parseHideComments()     (scan lines for @stream-guard-* tokens)
     → applyDecorations()      (set TextEditorDecorationType ranges)
 ```
 

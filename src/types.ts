@@ -5,24 +5,24 @@ import type * as vscode from "vscode";
  */
 export interface StreamGuardConfig {
     enabled: boolean;
-    redactedFilePatterns: string[];
-    redactedFolders: string[];
+    maskedFilePatterns: string[];
+    maskedFolders: string[];
 }
 
 /**
- * Describes a range of lines in a document that should be redacted.
+ * Describes a range of lines in a document that should be masked.
  */
-export interface RedactedRange {
+export interface MaskedRange {
     startLine: number;
     /** Inclusive end line. */
     endLine: number;
 }
 
 /**
- * Result of parsing a single document for hide comments.
+ * Result of parsing a single document for guard comments.
  */
 export interface ParseResult {
-    redactedRanges: RedactedRange[];
+    maskedRanges: MaskedRange[];
 }
 
 /**
@@ -30,7 +30,7 @@ export interface ParseResult {
  */
 export interface DecorationContext {
     editor: vscode.TextEditor;
-    redactedRanges: RedactedRange[];
+    maskedRanges: MaskedRange[];
 }
 
 /**

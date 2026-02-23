@@ -1,34 +1,30 @@
 import * as vscode from "vscode";
 import type { DecorationContext } from "../types";
 
-/** Single decoration type used for all redacted ranges (redaction bar style). */
-let redactedDecorationType: vscode.TextEditorDecorationType | undefined;
+/** Single decoration type used for all guarded ranges (overlay style). */
+let maskedDecorationType: vscode.TextEditorDecorationType | undefined;
 
 function getDecorationType(): vscode.TextEditorDecorationType {
-    if (redactedDecorationType) {
-        return redactedDecorationType;
+    if (maskedDecorationType) {
+        return maskedDecorationType;
     }
 
-    redactedDecorationType = vscode.window.createTextEditorDecorationType({
-        color: new vscode.ThemeColor("editorWarning.foreground"),
+    maskedDecorationType = vscode.window.createTextEditorDecorationType({
         backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
+        color: new vscode.ThemeColor("editor.background"),
         isWholeLine: true,
         overviewRulerColor: new vscode.ThemeColor("editorWarning.foreground"),
         overviewRulerLane: vscode.OverviewRulerLane.Full,
         before: {
-            contentText: "\u00A0\u00A0🔒\u00A0Redacted\u00A0\u00A0",
+            contentText: "\u00A0\u00A0\u26A0\uFE0F\u00A0Stream\u00A0Guard\u00A0Active\u00A0\u00A0",
             color: new vscode.ThemeColor("editor.background"),
             backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
             fontWeight: "bold",
             margin: "0 4px 0 0",
         },
-        after: {
-            contentText: "\u00A0",
-            backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
-        },
     });
 
-    return redactedDecorationType;
+    return maskedDecorationType;
 }
 
 /**
@@ -40,13 +36,13 @@ export function initDecorations(): void {
 }
 
 /**
- * Applies redaction decorations to the given editor for all redacted ranges.
+ * Applies redaction decorations to the given editor for all masked ranges.
  */
 export function applyDecorations(ctx: DecorationContext): void {
-    const { editor, redactedRanges } = ctx;
+    const { editor, maskedRanges } = ctx;
     const decorationType = getDecorationType();
 
-    const ranges = redactedRanges.map(({ startLine, endLine }) => {
+    const ranges = maskedRanges.map(({ startLine, endLine }) => {
         const start = editor.document.lineAt(startLine).range.start;
         const end = editor.document.lineAt(endLine).range.end;
         return new vscode.Range(start, end);
@@ -59,8 +55,8 @@ export function applyDecorations(ctx: DecorationContext): void {
  * Clears all StreamGuard decorations from the given editor.
  */
 export function clearDecorations(editor: vscode.TextEditor): void {
-    if (redactedDecorationType) {
-        editor.setDecorations(redactedDecorationType, []);
+    if (maskedDecorationType) {
+        editor.setDecorations(maskedDecorationType, []);
     }
 }
 
@@ -68,8 +64,8 @@ export function clearDecorations(editor: vscode.TextEditor): void {
  * Disposes all cached decoration types (call on extension deactivation).
  */
 export function disposeDecorations(): void {
-    if (redactedDecorationType) {
-        redactedDecorationType.dispose();
-        redactedDecorationType = undefined;
+    if (maskedDecorationType) {
+        maskedDecorationType.dispose();
+        maskedDecorationType = undefined;
     }
 }

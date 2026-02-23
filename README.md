@@ -1,8 +1,8 @@
 # StreamGuard — VSCode Extension
 
-Visually **redact** parts of your code during live streams (Twitch, YouTube, etc.) without ever modifying the actual source files.
+Apply a **decorative overlay** to selected lines of code during live streams (Twitch, YouTube, etc.) without ever modifying the actual source files.
 
-All redacting is done via the VSCode `TextEditorDecorationType` API — purely visual and non-destructive.
+All masking is done via the VSCode `TextEditorDecorationType` API — purely visual and non-destructive.
 
 ---
 
@@ -39,7 +39,7 @@ Or inside VS Code:
 
 ```bash
 # 1. Clone the repository
-git clone <your-repo-url>
+git clone <repository-url>
 cd stream-utils
 
 # 2. Install dependencies
@@ -60,8 +60,8 @@ code --install-extension stream-guard-*.vsix
 
 ## Features
 
-- **File/folder redacting** — glob-pattern-based full-file redacting via workspace settings
-- **Inline comment redacting** — annotate individual lines or blocks with special comments
+- **File/folder masking** — glob-pattern-based full-file masking via workspace settings
+- **Inline comment masking** — annotate individual lines or blocks with special comments
 - **Status bar indicator** — always know whether stream mode is active
 - **Toggle command** — quickly enable/disable with `StreamGuard: Toggle Stream Mode`
 - **Real-time updates** — decorations refresh instantly on every document change or config change
@@ -72,24 +72,24 @@ code --install-extension stream-guard-*.vsix
 
 | Annotation | Effect |
 |---|---|
-| `// @stream-hide-next` | Redacts the **next** line |
-| `// @stream-hide-inline` | Redacts the line that contains this annotation |
-| `// @stream-hide-start` | Starts a redacted block |
-| `// @stream-hide-end` | Ends a redacted block |
+| `// @stream-guard-next` | Masks the **next** line |
+| `// @stream-guard-inline` | Masks the line that contains this annotation |
+| `// @stream-guard-start` | Starts a masked block |
+| `// @stream-guard-end` | Ends a masked block |
 
 ### Examples
 
 ```ts
-// @stream-hide-next
-const greeting = "Hello, world!";    // ← this line is redacted
+// @stream-guard-next
+const greeting = "Hello, world!";    // ← this line is masked
 
-const config = loadSettings();       // @stream-hide-inline  ← this line is redacted
+const config = loadSettings();       // @stream-guard-inline  ← this line is masked
 
-// @stream-hide-start
+// @stream-guard-start
 const host = "localhost";
 const port = 3000;
-// @stream-hide-end
-// ↑ everything between start/end is redacted
+// @stream-guard-end
+// ↑ everything between start/end is masked
 ```
 
 ---
@@ -98,18 +98,18 @@ const port = 3000;
 
 ```json
 {
-  "StreamGuard.enabled": true,
-  "StreamGuard.redactedFilePatterns": ["**/.env", "**/config.local.*"],
-  "StreamGuard.redactedFolders": ["**/private/**"]
+  "streamGuard.enabled": true,
+  "streamGuard.maskedFilePatterns": ["**/generated.*", "**/build/output.*"],
+  "streamGuard.maskedFolders": ["**/draft/**"]
 }
 ```
 
 | Setting | Type | Default | Description |
 |---|---|---|---|
-| `StreamGuard.enabled` | `boolean` | `false` | Toggle the extension globally |
-| `StreamGuard.redactedFilePatterns` | `string[]` | `[]` | Glob patterns — files matching these have their entire content redacted |
-| `StreamGuard.redactedFolders` | `string[]` | `[]` | Glob patterns — files inside matching folders are fully redacted |
-| `StreamGuard.languageCommentPrefixes` | `object` | `{}` | Custom comment prefixes per language ID (e.g. `{ "lua": ["--"] }`) |
+| `streamGuard.enabled` | `boolean` | `false` | Toggle the extension globally |
+| `streamGuard.maskedFilePatterns` | `string[]` | `[]` | Glob patterns — files matching these have their entire content masked |
+| `streamGuard.maskedFolders` | `string[]` | `[]` | Glob patterns — files inside matching folders are fully masked |
+| `streamGuard.languageCommentPrefixes` | `object` | `{}` | Custom comment prefixes per language ID (e.g. `{ "lua": ["--"] }`) |
 
 ---
 
@@ -117,7 +117,7 @@ const port = 3000;
 
 | Command | Description |
 |---|---|
-| `StreamGuard: Toggle Stream Mode` | Enables or disables stream redacting |
+| `StreamGuard: Toggle Stream Mode` | Enables or disables stream masking |
 
 ---
 
@@ -140,10 +140,10 @@ src/
 ├── extension.ts               # Entry point (activate / deactivate)
 ├── constants.ts               # Command ids, config keys, comment tokens
 ├── types.ts                   # Shared TypeScript types
-├── hide/
-│   ├── comment-parser.ts      # Parse @stream-hide-* comments
+├── guard/
+│   ├── comment-parser.ts      # Parse @stream-guard-* comments
 │   ├── decoration-provider.ts # Apply/clear VSCode decorations
-│   ├── hide-manager.ts        # Main orchestrator
+│   ├── guard-manager.ts       # Main orchestrator
 │   └── pattern-matcher.ts     # Glob pattern matching for files/folders
 ├── config/
 │   ├── workspace-config.ts    # Read StreamGuard config from workspace

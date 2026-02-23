@@ -1,5 +1,5 @@
 import * as assert from "node:assert";
-import { matchesAnyPattern, matchesFolderPattern } from "../hide/pattern-matcher";
+import { matchesAnyPattern, matchesFolderPattern } from "../guard/pattern-matcher";
 
 describe("pattern-matcher", () => {
     describe("matchesAnyPattern", () => {

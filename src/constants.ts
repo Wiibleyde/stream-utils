@@ -10,18 +10,18 @@ export const COMMANDS = {
  */
 export const CONFIG_KEYS = {
     ENABLED: "streamGuard.enabled",
-    REDACTED_FILE_PATTERNS: "streamGuard.redactedFilePatterns",
-    REDACTED_FOLDERS: "streamGuard.redactedFolders",
+    MASKED_FILE_PATTERNS: "streamGuard.maskedFilePatterns",
+    MASKED_FOLDERS: "streamGuard.maskedFolders",
 } as const;
 
 /**
  * Comment tokens used to trigger inline redaction behaviour.
  */
 export const COMMENT_TOKENS = {
-    HIDE_NEXT: "@stream-hide-next",
-    HIDE_START: "@stream-hide-start",
-    HIDE_END: "@stream-hide-end",
-    HIDE_INLINE: "@stream-hide-inline",
+    GUARD_NEXT: "@stream-guard-next",
+    GUARD_START: "@stream-guard-start",
+    GUARD_END: "@stream-guard-end",
+    GUARD_INLINE: "@stream-guard-inline",
 } as const;
 
 /**

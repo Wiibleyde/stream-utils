@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { watchConfig } from "./config/config-watcher";
 import { readConfig } from "./config/workspace-config";
 import { COMMANDS } from "./constants";
-import { clearDecorations, disposeDecorations, initDecorations } from "./hide/decoration-provider";
+import { clearDecorations, disposeDecorations, initDecorations } from "./guard/decoration-provider";
 import {
     evictCacheForDocument,
     invalidateConfigCache,
@@ -10,7 +10,7 @@ import {
     refreshAllEditors,
     refreshEditor,
     toggleStreamMode,
-} from "./hide/hide-manager";
+} from "./guard/guard-manager";
 import { disposeLogger, logInfo } from "./utils/logger";
 
 let statusBarItem: vscode.StatusBarItem | undefined;
@@ -96,7 +96,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
             // Clear old decorations on every editor BEFORE re-parsing.
             // This prevents VS Code's internal Range-tracking from keeping
-            // shifted decorations visible after hide comments are removed.
+            // shifted decorations visible after guard comments are removed.
             for (const editor of editors) {
                 clearDecorations(editor);
             }

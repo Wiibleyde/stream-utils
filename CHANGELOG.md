@@ -9,8 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Added
 
 - **Stream mode toggle** — `StreamGuard: Toggle Stream Mode` command and status bar button.
-- **Comment-based hiding** — `@stream-hide-next`, `@stream-hide-inline`, `@stream-hide-start` / `@stream-hide-end` annotations.
-- **File/folder pattern hiding** — glob-based whole-file hiding via `StreamGuard.redactedFilePatterns` and `StreamGuard.redactedFolders`.
-- **Custom language comment prefixes** — override comment syntax per language ID via `StreamGuard.languageCommentPrefixes`.
+- **Comment-based masking** — `@stream-guard-next`, `@stream-guard-inline`, `@stream-guard-start` / `@stream-guard-end` annotations.
+- **File/folder pattern masking** — glob-based whole-file masking via `streamGuard.maskedFilePatterns` and `streamGuard.maskedFolders`.
+- **Custom language comment prefixes** — override comment syntax per language ID via `streamGuard.languageCommentPrefixes`.
 - **Built-in language support** — 20+ languages with pre-configured comment syntax.
 - **Real-time updates** — decorations refresh instantly on every document change or config change.

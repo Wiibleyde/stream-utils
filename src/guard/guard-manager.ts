@@ -1,16 +1,16 @@
 import * as vscode from "vscode";
 import { readConfig } from "../config/workspace-config";
-import type { RedactedRange, StreamGuardConfig } from "../types";
+import type { MaskedRange, StreamGuardConfig } from "../types";
 import { logInfo, logWarn } from "../utils/logger";
-import { parseHideComments } from "./comment-parser";
+import { parseGuardComments } from "./comment-parser";
 import { applyDecorations, clearDecorations } from "./decoration-provider";
 import { matchesAnyPattern } from "./pattern-matcher";
 
 /**
- * Cached redacted-range data per document URI, so we can apply decorations
+ * Cached masked-range data per document URI, so we can apply decorations
  * instantly when an editor becomes visible instead of re-parsing.
  */
-const rangeCache = new Map<string, RedactedRange[]>();
+const rangeCache = new Map<string, MaskedRange[]>();
 
 /** Cached config to avoid re-reading settings on every event. */
 let configCache: StreamGuardConfig | undefined;
@@ -30,7 +30,7 @@ function getCachedConfig(): StreamGuardConfig {
 }
 
 /**
- * Pre-parses a document and caches the redacted ranges so that when the
+ * Pre-parses a document and caches the masked ranges so that when the
  * editor appears we can apply decorations without re-parsing.
  */
 export function preCacheDocument(document: vscode.TextDocument): void {
@@ -42,10 +42,10 @@ export function preCacheDocument(document: vscode.TextDocument): void {
     const filePath = document.uri.fsPath;
     const key = document.uri.toString();
 
-    const fileIsRedacted = matchesAnyPattern(filePath, config.redactedFilePatterns);
-    const folderIsRedacted = matchesAnyPattern(filePath, config.redactedFolders);
+    const fileIsmasked = matchesAnyPattern(filePath, config.maskedFilePatterns);
+    const folderIsmasked = matchesAnyPattern(filePath, config.maskedFolders);
 
-    if (fileIsRedacted || folderIsRedacted) {
+    if (fileIsmasked || folderIsmasked) {
         const lineCount = document.lineCount;
         if (lineCount > 0) {
             rangeCache.set(key, [{ startLine: 0, endLine: lineCount - 1 }]);
@@ -58,9 +58,9 @@ export function preCacheDocument(document: vscode.TextDocument): void {
         lines.push(document.lineAt(i).text);
     }
 
-    const { redactedRanges } = parseHideComments(lines, document.languageId);
-    if (redactedRanges.length > 0) {
-        rangeCache.set(key, redactedRanges);
+    const { maskedRanges } = parseGuardComments(lines, document.languageId);
+    if (maskedRanges.length > 0) {
+        rangeCache.set(key, maskedRanges);
     } else {
         rangeCache.delete(key);
     }
@@ -100,23 +100,23 @@ export function refreshEditor(editor: vscode.TextEditor): void {
     // Try the cache first for instant application
     const cached = rangeCache.get(cacheKey);
     if (cached && cached.length > 0) {
-        applyDecorations({ editor, redactedRanges: cached });
+        applyDecorations({ editor, maskedRanges: cached });
         return;
     }
 
-    const fileIsRedacted = matchesAnyPattern(filePath, config.redactedFilePatterns);
-    const folderIsRedacted = matchesAnyPattern(filePath, config.redactedFolders);
+    const fileIsmasked = matchesAnyPattern(filePath, config.maskedFilePatterns);
+    const folderIsmasked = matchesAnyPattern(filePath, config.maskedFolders);
 
-    if (fileIsRedacted || folderIsRedacted) {
+    if (fileIsmasked || folderIsmasked) {
         const lineCount = editor.document.lineCount;
         if (lineCount === 0) {
             clearDecorations(editor);
             return;
         }
-        const redactedRanges = [{ startLine: 0, endLine: lineCount - 1 }];
-        rangeCache.set(cacheKey, redactedRanges);
-        applyDecorations({ editor, redactedRanges });
-        logInfo(`Redacted entire file: ${filePath}`);
+        const maskedRanges = [{ startLine: 0, endLine: lineCount - 1 }];
+        rangeCache.set(cacheKey, maskedRanges);
+        applyDecorations({ editor, maskedRanges });
+        logInfo(`masked entire file: ${filePath}`);
         return;
     }
 
@@ -126,17 +126,17 @@ export function refreshEditor(editor: vscode.TextEditor): void {
     }
 
     const languageId = editor.document.languageId;
-    const { redactedRanges } = parseHideComments(lines, languageId);
+    const { maskedRanges } = parseGuardComments(lines, languageId);
 
-    if (redactedRanges.length === 0) {
+    if (maskedRanges.length === 0) {
         rangeCache.delete(cacheKey);
         clearDecorations(editor);
         return;
     }
 
-    rangeCache.set(cacheKey, redactedRanges);
-    applyDecorations({ editor, redactedRanges });
-    logInfo(`Applied ${redactedRanges.length} redacted range(s) to ${filePath}`);
+    rangeCache.set(cacheKey, maskedRanges);
+    applyDecorations({ editor, maskedRanges });
+    logInfo(`Applied ${maskedRanges.length} masked range(s) to ${filePath}`);
 }
 
 /**
