@@ -1,18 +1,18 @@
 import type * as vscode from "vscode";
 
 /**
- * Resolved configuration for the StreamHider extension.
+ * Resolved configuration for the StreamGuard extension.
  */
-export interface StreamHiderConfig {
+export interface StreamGuardConfig {
     enabled: boolean;
-    hiddenFilePatterns: string[];
-    hiddenFolders: string[];
+    redactedFilePatterns: string[];
+    redactedFolders: string[];
 }
 
 /**
- * Describes a range of lines in a document that should be hidden.
+ * Describes a range of lines in a document that should be redacted.
  */
-export interface HiddenRange {
+export interface RedactedRange {
     startLine: number;
     /** Inclusive end line. */
     endLine: number;
@@ -22,7 +22,7 @@ export interface HiddenRange {
  * Result of parsing a single document for hide comments.
  */
 export interface ParseResult {
-    hiddenRanges: HiddenRange[];
+    redactedRanges: RedactedRange[];
 }
 
 /**
@@ -30,7 +30,7 @@ export interface ParseResult {
  */
 export interface DecorationContext {
     editor: vscode.TextEditor;
-    hiddenRanges: HiddenRange[];
+    redactedRanges: RedactedRange[];
 }
 
 /**

@@ -1,21 +1,21 @@
 /**
- * Command identifiers registered by the StreamHider extension.
+ * Command identifiers registered by the StreamGuard extension.
  */
 export const COMMANDS = {
-    TOGGLE: "streamHider.toggle",
+    TOGGLE: "streamGuard.toggle",
 } as const;
 
 /**
- * Configuration keys used in .vscode/settings.json under the "streamHider" namespace.
+ * Configuration keys used in .vscode/settings.json under the "streamGuard" namespace.
  */
 export const CONFIG_KEYS = {
-    ENABLED: "streamHider.enabled",
-    HIDDEN_FILE_PATTERNS: "streamHider.hiddenFilePatterns",
-    HIDDEN_FOLDERS: "streamHider.hiddenFolders",
+    ENABLED: "streamGuard.enabled",
+    REDACTED_FILE_PATTERNS: "streamGuard.redactedFilePatterns",
+    REDACTED_FOLDERS: "streamGuard.redactedFolders",
 } as const;
 
 /**
- * Comment tokens used to trigger inline hiding behaviour.
+ * Comment tokens used to trigger inline redaction behaviour.
  */
 export const COMMENT_TOKENS = {
     HIDE_NEXT: "@stream-hide-next",
@@ -27,9 +27,9 @@ export const COMMENT_TOKENS = {
 /**
  * Configuration key for user-defined language comment prefixes.
  */
-export const LANGUAGE_CONFIG_KEY = "streamHider.languageCommentPrefixes";
+export const LANGUAGE_CONFIG_KEY = "streamGuard.languageCommentPrefixes";
 
 /**
  * Name of the VSCode OutputChannel used for extension logging.
  */
-export const OUTPUT_CHANNEL_NAME = "StreamHider";
+export const OUTPUT_CHANNEL_NAME = "StreamGuard";

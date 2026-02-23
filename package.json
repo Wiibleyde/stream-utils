@@ -1,19 +1,11 @@
 {
-  "name": "stream-hider",
-  "displayName": "StreamHider",
+  "name": "stream-guard",
+  "displayName": "StreamGuard",
   "description": "Visually redact code during live streams — no file modifications",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "publisher": "NathanBonnell",
   "license": "MIT",
   "icon": "icon.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Wiibleyde/stream-utils.git"
-  },
-  "homepage": "https://github.com/Wiibleyde/stream-utils#readme",
-  "bugs": {
-    "url": "https://github.com/Wiibleyde/stream-utils/issues"
-  },
   "qna": "marketplace",
   "engines": {
     "vscode": "^1.85.0"
@@ -35,35 +27,35 @@
   "contributes": {
     "commands": [
       {
-        "command": "streamHider.toggle",
-        "title": "StreamHider: Toggle Stream Mode"
+        "command": "streamGuard.toggle",
+        "title": "StreamGuard: Toggle Stream Mode"
       }
     ],
     "configuration": {
-      "title": "StreamHider",
+      "title": "StreamGuard",
       "properties": {
-        "streamHider.enabled": {
+        "streamGuard.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable or disable StreamHider globally"
+          "description": "Enable or disable StreamGuard globally"
         },
-        "streamHider.hiddenFilePatterns": {
+        "streamGuard.redactedFilePatterns": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "default": [],
-          "description": "Glob patterns of files whose content should be hidden"
+          "description": "Glob patterns of files whose content should be redacted"
         },
-        "streamHider.hiddenFolders": {
+        "streamGuard.redactedFolders": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "default": [],
-          "description": "Folder glob patterns to hide in explorer and editor"
+          "description": "Folder glob patterns to redact in explorer and editor"
         },
-        "streamHider.languageCommentPrefixes": {
+        "streamGuard.languageCommentPrefixes": {
           "type": "object",
           "default": {},
           "description": "Custom comment prefixes per language ID. Maps a VSCode language ID to an array of single-line comment prefixes. Example: { \"lua\": [\"--\"], \"python\": [\"#\"] }",

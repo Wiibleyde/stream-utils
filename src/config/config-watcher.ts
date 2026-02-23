@@ -7,7 +7,7 @@ import { logInfo } from "../utils/logger";
  */
 export function watchConfig(onChange: () => void): vscode.Disposable {
     return vscode.workspace.onDidChangeConfiguration((event) => {
-        if (event.affectsConfiguration("streamHider")) {
+        if (event.affectsConfiguration("streamGuard")) {
             logInfo("Configuration changed — refreshing decorations.");
             onChange();
         }

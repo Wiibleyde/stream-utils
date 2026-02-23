@@ -1,6 +1,6 @@
 import { COMMENT_TOKENS } from "../constants";
 import { getCommentPrefixes } from "../languages/language-config";
-import type { HiddenRange, ParseResult } from "../types";
+import type { RedactedRange, ParseResult } from "../types";
 
 /**
  * Returns true when the line contains the given token inside a comment.
@@ -26,13 +26,13 @@ function isTokenInComment(line: string, token: string, commentPrefixes: string[]
 }
 
 /**
- * Parses the lines of a document and returns the ranges that should be hidden
+ * Parses the lines of a document and returns the ranges that should be redacted
  * based on `@stream-hide-*` comment annotations.
  *
  * Rules:
- *  - `// @stream-hide-next`   → hides the annotation *and* the next line
- *  - `// @stream-hide-start` / `// @stream-hide-end` → hides the block between them (inclusive)
- *  - `// @stream-hide-inline` at end of line → hides that specific line
+ *  - `// @stream-hide-next`   → redacts the annotation *and* the next line
+ *  - `// @stream-hide-start` / `// @stream-hide-end` → redacts the block between them (inclusive)
+ *  - `// @stream-hide-inline` at end of line → redacts that specific line
  *
  * An optional `languageId` (VSCode language identifier) can be supplied to
  * restrict token matching to lines that contain a recognised comment prefix
@@ -40,7 +40,7 @@ function isTokenInComment(line: string, token: string, commentPrefixes: string[]
  * any line that contains the token text.
  */
 export function parseHideComments(lines: string[], languageId?: string): ParseResult {
-    const hiddenRanges: HiddenRange[] = [];
+    const redactedRanges: RedactedRange[] = [];
     let hideNextFrom: number | undefined;
     let blockStart: number | undefined;
 
@@ -56,7 +56,7 @@ export function parseHideComments(lines: string[], languageId?: string): ParseRe
 
         if (isTokenInComment(line, COMMENT_TOKENS.HIDE_END, prefixes)) {
             if (blockStart !== undefined) {
-                hiddenRanges.push({ startLine: blockStart, endLine: i });
+                redactedRanges.push({ startLine: blockStart, endLine: i });
                 blockStart = undefined;
             }
             continue;
@@ -68,21 +68,21 @@ export function parseHideComments(lines: string[], languageId?: string): ParseRe
         }
 
         if (isTokenInComment(line, COMMENT_TOKENS.HIDE_INLINE, prefixes)) {
-            hiddenRanges.push({ startLine: i, endLine: i });
+            redactedRanges.push({ startLine: i, endLine: i });
             hideNextFrom = undefined;
             continue;
         }
 
         if (hideNextFrom !== undefined) {
-            hiddenRanges.push({ startLine: hideNextFrom, endLine: i });
+            redactedRanges.push({ startLine: hideNextFrom, endLine: i });
             hideNextFrom = undefined;
         }
     }
 
-    // If @stream-hide-next was the very last line, still hide the annotation itself
+    // If @stream-hide-next was the very last line, still redact the annotation itself
     if (hideNextFrom !== undefined) {
-        hiddenRanges.push({ startLine: hideNextFrom, endLine: hideNextFrom });
+        redactedRanges.push({ startLine: hideNextFrom, endLine: hideNextFrom });
     }
 
-    return { hiddenRanges };
+    return { redactedRanges };
 }

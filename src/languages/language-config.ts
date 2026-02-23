@@ -1,7 +1,7 @@
 import type { LanguageCommentConfig } from "../types";
 
 /**
- * Built-in language definitions shipped with StreamHider.
+ * Built-in language definitions shipped with StreamGuard.
  * Each entry maps a VSCode language identifier to its comment syntax.
  */
 const BUILTIN_LANGUAGES: LanguageCommentConfig[] = [
@@ -211,7 +211,7 @@ export function getSupportedLanguageIds(): string[] {
 
 /**
  * Registers or overrides a language config at runtime.
- * Used to apply user-defined `streamHider.languageCommentPrefixes`.
+ * Used to apply user-defined `streamGuard.languageCommentPrefixes`.
  */
 export function registerLanguageConfig(config: LanguageCommentConfig): void {
     languageMap.set(config.id, config);

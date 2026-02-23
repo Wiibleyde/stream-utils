@@ -1,5 +1,6 @@
 {
-    "streamHider.hiddenFolders": [
-        "**/config/**",
-    ]
+    "streamGuard.redactedFolders": [
+        "**/config/**"
+    ],
+    "streamGuard.enabled": false
 }

@@ -1,17 +1,17 @@
 import * as vscode from "vscode";
 import { CONFIG_KEYS, LANGUAGE_CONFIG_KEY } from "../constants";
 import { applyCustomPrefixes } from "../languages/language-config";
-import type { StreamHiderConfig } from "../types";
+import type { StreamGuardConfig } from "../types";
 
 /**
- * Reads the StreamHider configuration from the current workspace settings.
+ * Reads the StreamGuard configuration from the current workspace settings.
  */
-export function readConfig(): StreamHiderConfig {
+export function readConfig(): StreamGuardConfig {
     const cfg = vscode.workspace.getConfiguration();
 
     const enabled = cfg.get<boolean>(CONFIG_KEYS.ENABLED) ?? false;
-    const hiddenFilePatterns = cfg.get<string[]>(CONFIG_KEYS.HIDDEN_FILE_PATTERNS) ?? [];
-    const hiddenFolders = cfg.get<string[]>(CONFIG_KEYS.HIDDEN_FOLDERS) ?? [];
+    const redactedFilePatterns = cfg.get<string[]>(CONFIG_KEYS.REDACTED_FILE_PATTERNS) ?? [];
+    const redactedFolders = cfg.get<string[]>(CONFIG_KEYS.REDACTED_FOLDERS) ?? [];
 
     // Apply user-defined language comment prefixes (if any)
     const customPrefixes = cfg.get<Record<string, string[]>>(LANGUAGE_CONFIG_KEY) ?? {};
@@ -19,5 +19,5 @@ export function readConfig(): StreamHiderConfig {
         applyCustomPrefixes(customPrefixes);
     }
 
-    return { enabled, hiddenFilePatterns, hiddenFolders };
+    return { enabled, redactedFilePatterns, redactedFolders };
 }

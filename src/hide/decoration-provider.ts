@@ -1,18 +1,17 @@
 import * as vscode from "vscode";
 import type { DecorationContext } from "../types";
 
-/** Single decoration type used for all hidden ranges (redaction bar style). */
-let hiddenDecorationType: vscode.TextEditorDecorationType | undefined;
+/** Single decoration type used for all redacted ranges (redaction bar style). */
+let redactedDecorationType: vscode.TextEditorDecorationType | undefined;
 
 function getDecorationType(): vscode.TextEditorDecorationType {
-    if (hiddenDecorationType) {
-        return hiddenDecorationType;
+    if (redactedDecorationType) {
+        return redactedDecorationType;
     }
 
-    hiddenDecorationType = vscode.window.createTextEditorDecorationType({
+    redactedDecorationType = vscode.window.createTextEditorDecorationType({
         color: new vscode.ThemeColor("editorWarning.foreground"),
         backgroundColor: new vscode.ThemeColor("editorWarning.foreground"),
-        letterSpacing: "-0.5em",
         isWholeLine: true,
         overviewRulerColor: new vscode.ThemeColor("editorWarning.foreground"),
         overviewRulerLane: vscode.OverviewRulerLane.Full,
@@ -29,7 +28,7 @@ function getDecorationType(): vscode.TextEditorDecorationType {
         },
     });
 
-    return hiddenDecorationType;
+    return redactedDecorationType;
 }
 
 /**
@@ -41,13 +40,13 @@ export function initDecorations(): void {
 }
 
 /**
- * Applies hiding decorations to the given editor for all hidden ranges.
+ * Applies redaction decorations to the given editor for all redacted ranges.
  */
 export function applyDecorations(ctx: DecorationContext): void {
-    const { editor, hiddenRanges } = ctx;
+    const { editor, redactedRanges } = ctx;
     const decorationType = getDecorationType();
 
-    const ranges = hiddenRanges.map(({ startLine, endLine }) => {
+    const ranges = redactedRanges.map(({ startLine, endLine }) => {
         const start = editor.document.lineAt(startLine).range.start;
         const end = editor.document.lineAt(endLine).range.end;
         return new vscode.Range(start, end);
@@ -57,11 +56,11 @@ export function applyDecorations(ctx: DecorationContext): void {
 }
 
 /**
- * Clears all StreamHider decorations from the given editor.
+ * Clears all StreamGuard decorations from the given editor.
  */
 export function clearDecorations(editor: vscode.TextEditor): void {
-    if (hiddenDecorationType) {
-        editor.setDecorations(hiddenDecorationType, []);
+    if (redactedDecorationType) {
+        editor.setDecorations(redactedDecorationType, []);
     }
 }
 
@@ -69,8 +68,8 @@ export function clearDecorations(editor: vscode.TextEditor): void {
  * Disposes all cached decoration types (call on extension deactivation).
  */
 export function disposeDecorations(): void {
-    if (hiddenDecorationType) {
-        hiddenDecorationType.dispose();
-        hiddenDecorationType = undefined;
+    if (redactedDecorationType) {
+        redactedDecorationType.dispose();
+        redactedDecorationType = undefined;
     }
 }

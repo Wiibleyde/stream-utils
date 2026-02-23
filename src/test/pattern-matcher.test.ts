@@ -12,7 +12,7 @@ describe("pattern-matcher", () => {
         });
 
         it("matches a wildcard extension pattern against the basename", () => {
-            assert.strictEqual(matchesAnyPattern("src/secrets.env", ["*.env"]), true);
+            assert.strictEqual(matchesAnyPattern("src/data.env", ["*.env"]), true);
         });
 
         it("does not match a different extension", () => {
@@ -20,11 +20,11 @@ describe("pattern-matcher", () => {
         });
 
         it("matches a globstar pattern against a full path", () => {
-            assert.strictEqual(matchesAnyPattern("config/secrets/api.json", ["config/secrets/**"]), true);
+            assert.strictEqual(matchesAnyPattern("config/local/api.json", ["config/local/**"]), true);
         });
 
         it("matches a nested path with **", () => {
-            assert.strictEqual(matchesAnyPattern("a/b/c/secret.ts", ["**/*.ts"]), true);
+            assert.strictEqual(matchesAnyPattern("a/b/c/module.ts", ["**/*.ts"]), true);
         });
 
         it("does not match when the path differs", () => {
@@ -36,13 +36,13 @@ describe("pattern-matcher", () => {
         });
 
         it("handles Windows-style backslash paths by normalising to forward slashes", () => {
-            assert.strictEqual(matchesAnyPattern("src\\secrets\\key.txt", ["src/secrets/**"]), true);
+            assert.strictEqual(matchesAnyPattern("src\\local\\key.txt", ["src/local/**"]), true);
         });
     });
 
     describe("matchesFolderPattern", () => {
         it("matches a folder name directly", () => {
-            assert.strictEqual(matchesFolderPattern("secrets", ["secrets"]), true);
+            assert.strictEqual(matchesFolderPattern("internal", ["internal"]), true);
         });
 
         it("matches a folder path with a globstar", () => {
@@ -50,7 +50,7 @@ describe("pattern-matcher", () => {
         });
 
         it("returns false when no patterns match", () => {
-            assert.strictEqual(matchesFolderPattern("src/utils", ["secrets", "private"]), false);
+            assert.strictEqual(matchesFolderPattern("src/utils", ["internal", "private"]), false);
         });
     });
 });

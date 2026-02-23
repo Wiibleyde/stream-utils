@@ -1,19 +1,19 @@
 import * as vscode from "vscode";
 import { readConfig } from "../config/workspace-config";
-import type { HiddenRange, StreamHiderConfig } from "../types";
+import type { RedactedRange, StreamGuardConfig } from "../types";
 import { logInfo, logWarn } from "../utils/logger";
 import { parseHideComments } from "./comment-parser";
 import { applyDecorations, clearDecorations } from "./decoration-provider";
 import { matchesAnyPattern } from "./pattern-matcher";
 
 /**
- * Cached hidden-range data per document URI, so we can apply decorations
+ * Cached redacted-range data per document URI, so we can apply decorations
  * instantly when an editor becomes visible instead of re-parsing.
  */
-const rangeCache = new Map<string, HiddenRange[]>();
+const rangeCache = new Map<string, RedactedRange[]>();
 
 /** Cached config to avoid re-reading settings on every event. */
-let configCache: StreamHiderConfig | undefined;
+let configCache: StreamGuardConfig | undefined;
 let configDirty = true;
 
 /** Mark the cached config as stale (called on config change). */
@@ -21,7 +21,7 @@ export function invalidateConfigCache(): void {
     configDirty = true;
 }
 
-function getCachedConfig(): StreamHiderConfig {
+function getCachedConfig(): StreamGuardConfig {
     if (configDirty || !configCache) {
         configCache = readConfig();
         configDirty = false;
@@ -30,7 +30,7 @@ function getCachedConfig(): StreamHiderConfig {
 }
 
 /**
- * Pre-parses a document and caches the hidden ranges so that when the
+ * Pre-parses a document and caches the redacted ranges so that when the
  * editor appears we can apply decorations without re-parsing.
  */
 export function preCacheDocument(document: vscode.TextDocument): void {
@@ -42,10 +42,10 @@ export function preCacheDocument(document: vscode.TextDocument): void {
     const filePath = document.uri.fsPath;
     const key = document.uri.toString();
 
-    const fileIsHidden = matchesAnyPattern(filePath, config.hiddenFilePatterns);
-    const folderIsHidden = matchesAnyPattern(filePath, config.hiddenFolders);
+    const fileIsRedacted = matchesAnyPattern(filePath, config.redactedFilePatterns);
+    const folderIsRedacted = matchesAnyPattern(filePath, config.redactedFolders);
 
-    if (fileIsHidden || folderIsHidden) {
+    if (fileIsRedacted || folderIsRedacted) {
         const lineCount = document.lineCount;
         if (lineCount > 0) {
             rangeCache.set(key, [{ startLine: 0, endLine: lineCount - 1 }]);
@@ -58,9 +58,9 @@ export function preCacheDocument(document: vscode.TextDocument): void {
         lines.push(document.lineAt(i).text);
     }
 
-    const { hiddenRanges } = parseHideComments(lines, document.languageId);
-    if (hiddenRanges.length > 0) {
-        rangeCache.set(key, hiddenRanges);
+    const { redactedRanges } = parseHideComments(lines, document.languageId);
+    if (redactedRanges.length > 0) {
+        rangeCache.set(key, redactedRanges);
     } else {
         rangeCache.delete(key);
     }
@@ -100,23 +100,23 @@ export function refreshEditor(editor: vscode.TextEditor): void {
     // Try the cache first for instant application
     const cached = rangeCache.get(cacheKey);
     if (cached && cached.length > 0) {
-        applyDecorations({ editor, hiddenRanges: cached });
+        applyDecorations({ editor, redactedRanges: cached });
         return;
     }
 
-    const fileIsHidden = matchesAnyPattern(filePath, config.hiddenFilePatterns);
-    const folderIsHidden = matchesAnyPattern(filePath, config.hiddenFolders);
+    const fileIsRedacted = matchesAnyPattern(filePath, config.redactedFilePatterns);
+    const folderIsRedacted = matchesAnyPattern(filePath, config.redactedFolders);
 
-    if (fileIsHidden || folderIsHidden) {
+    if (fileIsRedacted || folderIsRedacted) {
         const lineCount = editor.document.lineCount;
         if (lineCount === 0) {
             clearDecorations(editor);
             return;
         }
-        const hiddenRanges = [{ startLine: 0, endLine: lineCount - 1 }];
-        rangeCache.set(cacheKey, hiddenRanges);
-        applyDecorations({ editor, hiddenRanges });
-        logInfo(`Hidden entire file: ${filePath}`);
+        const redactedRanges = [{ startLine: 0, endLine: lineCount - 1 }];
+        rangeCache.set(cacheKey, redactedRanges);
+        applyDecorations({ editor, redactedRanges });
+        logInfo(`Redacted entire file: ${filePath}`);
         return;
     }
 
@@ -126,21 +126,21 @@ export function refreshEditor(editor: vscode.TextEditor): void {
     }
 
     const languageId = editor.document.languageId;
-    const { hiddenRanges } = parseHideComments(lines, languageId);
+    const { redactedRanges } = parseHideComments(lines, languageId);
 
-    if (hiddenRanges.length === 0) {
+    if (redactedRanges.length === 0) {
         rangeCache.delete(cacheKey);
         clearDecorations(editor);
         return;
     }
 
-    rangeCache.set(cacheKey, hiddenRanges);
-    applyDecorations({ editor, hiddenRanges });
-    logInfo(`Applied ${hiddenRanges.length} hidden range(s) to ${filePath}`);
+    rangeCache.set(cacheKey, redactedRanges);
+    applyDecorations({ editor, redactedRanges });
+    logInfo(`Applied ${redactedRanges.length} redacted range(s) to ${filePath}`);
 }
 
 /**
- * Toggles the `streamHider.enabled` setting in the user configuration.
+ * Toggles the `streamGuard.enabled` setting in the user configuration.
  */
 export async function toggleStreamMode(): Promise<void> {
     const config = getCachedConfig();
@@ -149,7 +149,7 @@ export async function toggleStreamMode(): Promise<void> {
     try {
         await vscode.workspace
             .getConfiguration()
-            .update("streamHider.enabled", newValue, vscode.ConfigurationTarget.Global);
+            .update("streamGuard.enabled", newValue, vscode.ConfigurationTarget.Workspace);
         invalidateConfigCache();
         logInfo(`Stream mode ${newValue ? "enabled" : "disabled"}.`);
     } catch (err) {

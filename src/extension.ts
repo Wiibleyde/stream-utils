@@ -22,12 +22,12 @@ function updateStatusBar(): void {
 
     const { enabled } = readConfig();
     statusBarItem.text = enabled ? "$(eye-closed) Stream Mode ON" : "$(eye) Stream Mode OFF";
-    statusBarItem.tooltip = "Click to toggle StreamHider";
+    statusBarItem.tooltip = "Click to toggle StreamGuard";
     statusBarItem.backgroundColor = enabled ? new vscode.ThemeColor("statusBarItem.warningBackground") : undefined;
 }
 
 export function activate(context: vscode.ExtensionContext): void {
-    logInfo("StreamHider activating.");
+    logInfo("StreamGuard activating.");
 
     // Eagerly create the decoration type so it's ready before any editor opens
     initDecorations();
@@ -121,7 +121,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Initial decoration pass
     refreshAllEditors();
 
-    logInfo("StreamHider activated.");
+    logInfo("StreamGuard activated.");
 }
 
 export function deactivate(): void {
