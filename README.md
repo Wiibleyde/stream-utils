@@ -83,13 +83,13 @@ code --install-extension stream-hider-*.vsix
 
 ```ts
 // @stream-hide-next
-const apiKey = "super-secret-key";   // ← this line is hidden
+const myValue = "some-value-here";   // ← this line is hidden
 
-const token = process.env.TOKEN;     // @stream-hide-inline  ← this line is hidden
+const config = getConfig();          // @stream-hide-inline  ← this line is hidden
 
 // @stream-hide-start
-const dbPassword = "hunter2";
-const dbUser = "admin";
+const connectionString = "...";      // These lines
+const endpoint = "...";              // are all hidden
 // @stream-hide-end
 // ↑ everything between start/end is hidden
 ```
@@ -101,7 +101,7 @@ const dbUser = "admin";
 ```json
 {
   "streamHider.enabled": true,
-  "streamHider.hiddenFilePatterns": ["**/.env", "**/secrets.*"],
+  "streamHider.hiddenFilePatterns": ["**/.env", "**/config.local.*"],
   "streamHider.hiddenFolders": ["**/private/**"]
 }
 ```
