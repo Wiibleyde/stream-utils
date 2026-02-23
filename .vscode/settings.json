@@ -1,6 +1,0 @@
-{
-    "streamGuard.maskedFolders": [
-        "**/config/**"
-    ],
-    "streamGuard.enabled": false
-}
