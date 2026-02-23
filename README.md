@@ -102,8 +102,7 @@ const dbUser = "admin";
 {
   "streamHider.enabled": true,
   "streamHider.hiddenFilePatterns": ["**/.env", "**/secrets.*"],
-  "streamHider.hiddenFolders": ["**/private/**"],
-  "streamHider.replacement": "[ 🔴 HIDDEN ]"
+  "streamHider.hiddenFolders": ["**/private/**"]
 }
 ```
 
@@ -112,7 +111,7 @@ const dbUser = "admin";
 | `streamHider.enabled` | `boolean` | `false` | Toggle the extension globally |
 | `streamHider.hiddenFilePatterns` | `string[]` | `[]` | Glob patterns — files matching these have their entire content hidden |
 | `streamHider.hiddenFolders` | `string[]` | `[]` | Glob patterns — files inside matching folders are fully hidden |
-| `streamHider.replacement` | `string` | `[ 🔴 HIDDEN ]` | Placeholder text shown in place of hidden content |
+| `streamHider.languageCommentPrefixes` | `object` | `{}` | Custom comment prefixes per language ID (e.g. `{ "lua": ["--"] }`) |
 
 ---
 
